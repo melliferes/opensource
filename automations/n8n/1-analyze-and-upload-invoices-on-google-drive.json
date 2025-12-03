@@ -1,5 +1,5 @@
 {
-  "name": "Centraliser ses factures",
+  "name": "Analyse et téléverse une facture sur Google Drive venant d'un courriel",
   "nodes": [
     {
       "parameters": {
@@ -24,13 +24,7 @@
       "position": [
         4112,
         -288
-      ],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "DCu4u0APMX0tx04W",
-          "name": "Google Drive | alex@lamainverte.ca"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -81,13 +75,7 @@
         16
       ],
       "id": "ccb7ef1b-eff9-48a5-bf7f-aa0a54a9c17a",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "cLzGi3BTmU7noI92",
-          "name": "OpenAi account | Personal account"
-        }
-      }
+      "name": "OpenAI Chat Model"
     },
     {
       "parameters": {
@@ -112,13 +100,7 @@
       ],
       "id": "170c92db-7051-4c0a-a34f-9d25dd6eb89f",
       "name": "Analyze image",
-      "alwaysOutputData": false,
-      "credentials": {
-        "openAiApi": {
-          "id": "cLzGi3BTmU7noI92",
-          "name": "OpenAi account | Personal account"
-        }
-      }
+      "alwaysOutputData": false
     },
     {
       "parameters": {
@@ -162,13 +144,7 @@
       "position": [
         2400,
         -288
-      ],
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "JoBemgVFg5OPyht8",
-          "name": "Gmail | alex@lamainverte.ca"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -238,13 +214,13 @@
             {
               "id": "id-1",
               "name": "googleDriveFolderURL",
-              "value": "https://drive.google.com/drive/folders/15kmLg0GuhM0E2ljWMeDwDdy5KDC9adKc",
+              "value": "https://drive.google.com/drive/folders/YOUR_FOLDER_ID",
               "type": "string"
             },
             {
               "id": "17ecbf03-58fc-4a42-98ac-36a2544c2385",
               "name": "courriel",
-              "value": "factures@lamainverte.ca",
+              "value": "your-email@example.com",
               "type": "string"
             }
           ]
@@ -467,8 +443,8 @@
   },
   "versionId": "7818b512-ad34-416a-ad9e-6d5799b58189",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "ad035d2a5581676a0fe3793088d0010a584ae52ee51f2165e17973a0d5fe5dec"
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
   },
   "id": "fLpgevS3qiKz57df",
   "tags": []
