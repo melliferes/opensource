@@ -1,0 +1,475 @@
+{
+  "name": "Centraliser ses factures",
+  "nodes": [
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $('AI Agent').item.json.output.ai_generated_filename }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Configuration').first().json.googleDriveFolderURL }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "id": "454ac454-675d-4e99-bdd1-aa9536f19e6b",
+      "name": "Upload Invoice to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4112,
+        -288
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "DCu4u0APMX0tx04W",
+          "name": "Google Drive | alex@lamainverte.ca"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json[\"0\"].content[0].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are responsible for structuring invoice filenames for online storage.\n\nYour task is to:\n1. Analyze the provided invoice description\n2. Generate a filename that includes: seller, seller type, date, total amount, city\n3. Keep the filename under 100 characters\n4. Never invent data that is not in the description\n5. Return ONLY the structured filename in the required JSON format\n\nExample format: 2025-02-01-facture-cafe-trois-riviere-20.40"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        3536,
+        -160
+      ],
+      "id": "9dd78250-6f68-4606-8522-e7d28ef730c9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"ai_generated_filename\": \"2025-11-28-cafe-pa-trois-riviere-20.40\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3680,
+        16
+      ],
+      "id": "e689c34d-ae0c-4a70-bf8e-4db0f1269a5e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3504,
+        16
+      ],
+      "id": "ccb7ef1b-eff9-48a5-bf7f-aa0a54a9c17a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "cLzGi3BTmU7noI92",
+          "name": "OpenAi account | Personal account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "={{ $('Configuration IA').item.json.aiInstructionsForExtractingData }}",
+        "inputType": "base64",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        3312,
+        -160
+      ],
+      "id": "170c92db-7051-4c0a-a34f-9d25dd6eb89f",
+      "name": "Analyze image",
+      "alwaysOutputData": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "cLzGi3BTmU7noI92",
+          "name": "OpenAi account | Personal account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Configuration obligatoire\n\n1) Courriel qui reçoit les factures. \n\nExemple: factures@votrenom.com\n\n2) Dossier Google dans lequel vous aimeriez que vos factures s'ajoutent\n",
+        "height": 448,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2544,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "94d22054-cd28-4b18-9b51-5ccf314a3d95",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [],
+          "sender": ""
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "ce51e7a6-02b4-402f-af69-976bcb9984b0",
+      "name": "When all email arrives",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        2400,
+        -288
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JoBemgVFg5OPyht8",
+          "name": "Gmail | alex@lamainverte.ca"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### 🛑 Limitations\n- Ne gère pas encore les documents PDFs\n- Ne gère pas plusieurs factures à la fois\n- Risque de mal fonctionner lorsqu'il y a plusieurs destinataires dans le courriel\n- etc",
+        "width": 416,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2448,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "fdc305a1-5479-497c-bb2e-f5496994bf70",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "🐝 Automatisation offerte par Melliferes.ca \n\nLa mission de Mellifères est d'accélérer les projets écologiques sur le thème de l'autonomie alimentaire.\n\nNous vous invitons à contribuer aux suggestions et aux améliorations en partageant vos besoins ou vos découvertes.\n\nSi vous souhaitez faire une contribution consciente pour accélérer nos travaux, vous pouvez faire un paiement Interact à equipe@melliferes.ca nous vous enverrons une facture, qui sera, on l'espère, traitée automatiquement 😉",
+        "height": 272,
+        "width": 416,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2448,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "5ceaf6de-2038-4f50-b326-7e65d88d130f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44fb7f90-25ce-497c-abe1-f0699f932172",
+              "name": "aiInstructionsForFileNaming",
+              "value": "=Vous êtes responsable de structurer le nom de fichier de nos factures pour notre stockage en ligne.\n\n# Consignes\n\n- Nous aimons que le nom contienne le vendeur, le type de vendeur, la date, le montant total, la ville, etc. \n- Mais le nom du fichier ne doit pas dépasser 100 caractères.\n- N'invente pas un montant ou toute donnée qui ne fait pas partie de la description fournie\n\n# Exemples de bons noms de fichiers :\n\nExemple 1 : 2025-02-01-facture-cafe-trois-riviere-20.40\n\n# Description concernant cette facture spécifique :",
+              "type": "string"
+            },
+            {
+              "id": "49077d2f-9e6b-41a5-b71a-1c6e71c791a2",
+              "name": "aiInstructionsForExtractingData",
+              "value": "What's in this invoice ? Maybe sure to extract at least : \n\n- Seller\n- Seller category\n- Total amount\n- Generate description of the purchase\n- Location of the purchase (city ideally)\n- Date of the purchase",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1d16187a-05e3-4819-8be6-b4040fe0cbcc",
+      "name": "Configuration IA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2864,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "googleDriveFolderURL",
+              "value": "https://drive.google.com/drive/folders/15kmLg0GuhM0E2ljWMeDwDdy5KDC9adKc",
+              "type": "string"
+            },
+            {
+              "id": "17ecbf03-58fc-4a42-98ac-36a2544c2385",
+              "name": "courriel",
+              "value": "factures@lamainverte.ca",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "bd8fea8d-defd-4d5e-b806-7b6415eb982b",
+      "name": "Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2640,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Configuration optionnelle\n\nA) l'instruction pour l'IA qui va analyser votre image\n\nB) l'instruction pour l'IA qui va nommer vos fichiers\n\n\n\n\n\n\n",
+        "height": 368,
+        "width": 208,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2784,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "7bc1b36f-1912-4497-8ba3-4d538e155632",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f7edec0b-1333-4325-a7c2-8d984150e38a",
+              "leftValue": "={{ $json.headers['delivered-to'] }}",
+              "rightValue": "={{ $('Configuration').item.json.courriel }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "e3d9f6dd-b596-491c-960b-6e4f85e6a0df",
+              "leftValue": "={{ $('When all email arrives').item.binary}}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3088,
+        -288
+      ],
+      "id": "b12b8e21-6120-4f67-8539-1f6abb9530c8",
+      "name": "If the email is for invoices and has attachments"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "id": "f6fa7c9c-9528-4def-8332-ee57bf74327f",
+      "name": "Merge Binary and Filename",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3920,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Automatisation Mellifères.ca\n##  Analyse une facture avec l'IA et la téléverse sur Google Drive \n\nPré-requis : \n- Un compte avec Open AI \n-- [tutoriel](https://docs.n8n.io/integrations/builtin/credentials/openai/?utm_source=n8n_app&utm_medium=credential_settings&utm_campaign=create_new_credentials_modal)\n- Un compte Google Workspace\n-- [tutoriel](https://docs.n8n.io/integrations/builtin/credentials/google/oauth-single-service/?utm_source=n8n_app&utm_medium=credential_settings&utm_campaign=create_new_credentials_modal)\n\n\n\nVersion 1.0 - 2 décembre 2025\n",
+        "height": 256,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2384,
+        -912
+      ],
+      "typeVersion": 1,
+      "id": "16461dd0-71ec-4428-bc89-f4dfa7092270",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When all email arrives": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration IA": {
+      "main": [
+        [
+          {
+            "node": "If the email is for invoices and has attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "Configuration IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If the email is for invoices and has attachments": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Binary and Filename",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Binary and Filename",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Binary and Filename": {
+      "main": [
+        [
+          {
+            "node": "Upload Invoice to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7818b512-ad34-416a-ad9e-6d5799b58189",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ad035d2a5581676a0fe3793088d0010a584ae52ee51f2165e17973a0d5fe5dec"
+  },
+  "id": "fLpgevS3qiKz57df",
+  "tags": []
+}
