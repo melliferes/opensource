@@ -9,6 +9,14 @@ Ce dépôt contient une collection d'automatisations open-source développées p
 
 ### 1. Analyse et téléverse une facture sur Google Drive venant d'un courriel
 
+[![Présentation vidéo de l'automatisation](https://img.youtube.com/vi/V1akhAZkpp8/0.jpg)](https://youtu.be/V1akhAZkpp8)
+<br>
+🔽 **Regarder la démonstration sur YouTube** :
+
+[https://youtu.be/V1akhAZkpp8](https://youtu.be/V1akhAZkpp8)
+
+
+
 Cette automatisation analyse automatiquement les factures reçues par courriel et les téléverse sur Google Drive avec un nom de fichier structuré généré par l'IA.
 
 **Fichier** : [`1-analyze-and-upload-invoices-on-google-drive.json`](automations/n8n/1-analyze-and-upload-invoices-on-google-drive.json)
@@ -21,8 +29,8 @@ Cette automatisation analyse automatiquement les factures reçues par courriel e
 
 **Prérequis** :
 - Compte n8n (cloud ou self-hosted)
-- Compte OpenAI avec accès API
-- Compte Google Workspace (Gmail + Google Drive)
+- Compte OpenAI avec accès API ([Documentation des identifiants OpenAI](https://docs.n8n.io/integrations/builtin/credentials/openai/))
+- Compte Google Workspace (Gmail + Google Drive) ([Documentation des identifiants Google](https://docs.n8n.io/integrations/builtin/credentials/google/))
 
 **Documentation** : Voir les instructions dans le workflow n8n ou consulter la documentation n8n pour plus de détails.
 
@@ -36,6 +44,8 @@ Pour utiliser ces automatisations, vous aurez généralement besoin de :
 
 - **Une instance n8n** : [n8n cloud](https://n8n.io) ou installation self-hosted
 - **Comptes de services** : Selon l'automatisation (OpenAI, Google Workspace, etc.)
+  - [Documentation des identifiants OpenAI](https://docs.n8n.io/integrations/builtin/credentials/openai/)
+  - [Documentation des identifiants Google](https://docs.n8n.io/integrations/builtin/credentials/google/)
 - **Accès aux APIs** : Les automatisations utilisent diverses APIs pour fonctionner
 
 ### Installation d'une automatisation
